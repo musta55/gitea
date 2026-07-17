@@ -103,6 +103,17 @@ admin account you just created.
 > **Port already in use?** If something else owns `:3000`, start Gitea on another port:
 > `./gitea web --port 3030` and open http://localhost:3030 instead.
 
+### On macOS
+The same `./gitea web` command works — a few Mac-specific notes:
+
+- **Firewall prompt:** the first launch may ask *"Do you want the application `gitea` to accept
+  incoming network connections?"* — click **Allow** (it's the binary you just built).
+- **`permission denied`:** make the binary executable first: `chmod +x gitea`.
+- **Gatekeeper "cannot be opened" warning:** only affects binaries downloaded from a browser, not
+  ones you built yourself. If you ever run a downloaded release binary instead, clear the
+  quarantine flag: `xattr -d com.apple.quarantine ./gitea`.
+- **Apple Silicon (M1–M4):** fully supported — Go produces a native arm64 binary, nothing extra to do.
+
 ### Live-reload while developing (optional)
 If you have `make`:
 ```bash
@@ -154,8 +165,73 @@ pnpm exec vitest run
 
 ---
 
-## 8. Where to go next
+## 8. How to use the tool
 
-- Project layout and contributor conventions: [AGENTS.md](AGENTS.md), [CONTRIBUTING.md](CONTRIBUTING.md).
-- Full docs: <https://docs.gitea.com/>.
-- Pick a starter task from the course board and open a PR against your team's branch. Happy hacking!
+Gitea is a self-hosted Git service — the same workflow you know from GitHub, running on your machine:
+
+- Create a **repository** (tick "Initialize repository"), clone it, push branches.
+- Open **issues**, organize them on **project boards**, and label/assign them.
+- Open **pull requests** and try the **code-review UI** (diff viewer, line comments, approvals).
+- Explore **Actions** (built-in CI) and the admin panel (`Site Administration` under your avatar).
+
+📚 **Official documentation:** <https://docs.gitea.com/> — usage, administration, development guides.
+Project layout and contributor conventions: [AGENTS.md](AGENTS.md), [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+## 9. How to review the code
+
+Code review is part of the work, not an afterthought:
+
+1. Read the linked issue first, then the diff (GitHub → **Files changed**).
+2. Check out the branch locally, build, and run the relevant tests
+   (`go test ./modulepath/` or `pnpm exec vitest <path>`).
+3. Leave **line comments** for specific problems and finish with a summary review —
+   **Approve** or **Request changes**.
+4. Look for: correctness, tests covering the new behavior, naming/clarity, and unintended
+   changes (lockfiles, build artifacts, formatting noise — run `make fmt` / `make lint-go`).
+
+Every PR needs at least **one teammate approval** before merge — no self-merges. Review the code,
+not the person; be specific and constructive.
+
+---
+
+## 10. Pull requests (PRs)
+
+1. Branch off `main`: `git checkout -b feature/<short-name>` (or `fix/<issue-number>-<slug>`).
+2. This repo uses **Conventional Commits** for commit messages *and* PR titles:
+   `type(scope): subject` (e.g. `fix(issues): correct label filter on boards`).
+3. Run the relevant tests (section 6) and linters (`make lint-go`, `make lint-js`) before pushing.
+4. Push to the course fork and open the PR against the course fork's `main` — **never upstream**.
+5. In the description: what changed, why, how you tested it, and the linked issue (`Closes #12`).
+6. Address review comments with **new commits** — this repo's convention is *no force-push,
+   amend, or squash* while a PR is under review.
+
+---
+
+## 11. Issue resolution process
+
+1. All work is tracked as **GitHub Issues** on the course fork — bug, feature, or task.
+2. Before coding: pick or create an issue, get it **assigned** to you, and outline your approach
+   in a comment if it's non-trivial.
+3. One issue → one branch → one PR, linked with `Closes #<n>` so the issue closes automatically
+   on merge.
+4. Blocked for more than a day? Say so on the issue (what you tried, where you're stuck) instead
+   of going quiet.
+5. An issue is **done** when its PR is merged and the behavior is verified.
+
+---
+
+## 12. AI policies
+
+AI assistants (Claude, ChatGPT, Copilot, …) are allowed as a learning and productivity aid,
+under these rules:
+
+- **You are the author.** Understand and be able to explain every line you submit — "the AI
+  wrote it" is never an explanation.
+- **Test before you commit.** Never push AI-generated code you haven't run and tested locally.
+- **Disclose it.** Note meaningful AI assistance in the PR description, and follow this repo's
+  own convention (see [AGENTS.md](AGENTS.md)): AI-assisted commits carry an
+  `Assisted-by: <agent>:<model>` trailer; `Co-Authored-By`/`Signed-off-by` trailers are **not**
+  used for AI (sign-off is a human act).
+- **Protect data.** Never paste secrets, tokens, or private data into AI tools.
